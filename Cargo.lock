@@ -144,7 +144,9 @@ dependencies = [
  "eyre",
  "futures-util",
  "hyper",
+ "hyperx",
  "parking_lot",
+ "pin-project",
  "rustls",
  "serde",
  "tokio",
@@ -464,6 +466,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperx"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9eae1ec4abdc4530fb001ebf585fd14e52ed17f0aacd3e13de497b71ed451750"
+dependencies = [
+ "base64",
+ "bytes",
+ "http",
+ "httparse",
+ "language-tags",
+ "log",
+ "mime",
+ "percent-encoding",
+ "time 0.1.44",
+ "unicase",
+]
+
+[[package]]
 name = "idna"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -534,6 +554,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "language-tags"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a91d884b6667cd606bb5a69aa0c99ba811a115fc68915e7056ec08a46e93199a"
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -583,6 +609,12 @@ name = "memchr"
 version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
+
+[[package]]
+name = "mime"
+version = "0.3.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
 
 [[package]]
 name = "miniz_oxide"
@@ -1425,6 +1457,15 @@ name = "try-lock"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
+
+[[package]]
+name = "unicase"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50f37be617794602aabbeee0be4f259dc1778fabe05e2d67ee8f79326d5cb4f6"
+dependencies = [
+ "version_check",
+]
 
 [[package]]
 name = "unicode-bidi"

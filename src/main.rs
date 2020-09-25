@@ -24,6 +24,7 @@ use crate::tls::TlsAcceptor;
 
 mod acme;
 mod cert;
+mod log;
 mod redirect;
 mod settings;
 mod svc;
