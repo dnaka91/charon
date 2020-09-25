@@ -20,14 +20,13 @@ use tracing::info;
 
 use crate::acme::{Acme, ChallengeStorage};
 use crate::cert::Resolver;
+use crate::services::{MakeRedirect, MakeSvc};
 use crate::tls::TlsAcceptor;
 
 mod acme;
 mod cert;
-mod log;
-mod redirect;
+mod services;
 mod settings;
-mod svc;
 mod tls;
 
 #[tokio::main]
@@ -55,10 +54,10 @@ async fn main() -> Result<()> {
 
     let client = Client::new();
 
-    let https_server = Server::builder(acceptor).serve(svc::MakeSvc::new(client));
+    let https_server = Server::builder(acceptor).serve(MakeSvc::new(client));
 
     let http_addr = ([0, 0, 0, 0], 8080).into();
-    let http_server = Server::bind(&http_addr).serve(redirect::MakeRedirect::new(challenges));
+    let http_server = Server::bind(&http_addr).serve(MakeRedirect::new(challenges));
 
     info!("listening on {} for HTTP", http_addr);
     info!("listening on {} for HTTPS", https_addr);

@@ -11,7 +11,7 @@ use hyper::{Body, Client, Request, Response};
 use tower::Service;
 use tower::ServiceBuilder;
 
-use crate::log::{LogLayer, LogService};
+use super::log::{LogLayer, LogService};
 use crate::tls::TlsStream;
 
 pub struct Svc {
