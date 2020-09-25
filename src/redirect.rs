@@ -12,7 +12,11 @@ use hyper::http::Uri;
 use hyper::{Body, Request, Response};
 use tower::Service;
 
-pub struct Redirect;
+use crate::acme::ChallengeStorage;
+
+pub struct Redirect {
+    challenges: ChallengeStorage,
+}
 
 impl Service<Request<Body>> for Redirect {
     type Response = Response<Body>;
@@ -33,6 +37,14 @@ impl Service<Request<Body>> for Redirect {
             .and_then(|v| v.parse::<Uri>().ok());
 
         let rsp = if let Some(host) = host.as_ref().and_then(Uri::host) {
+            let path_and_query = req.uri().path_and_query().map_or("/", PathAndQuery::as_str);
+
+            if let Some(challenge) = self.challenges.read().get(host) {
+                if path_and_query == challenge.path {
+                    return future::ok(rsp.body(Body::from(challenge.proof.clone())).unwrap());
+                }
+            }
+
             let location = format!(
                 "https://{}:{}{}",
                 host,
@@ -50,7 +62,15 @@ impl Service<Request<Body>> for Redirect {
     }
 }
 
-pub struct MakeRedirect;
+pub struct MakeRedirect {
+    challenges: ChallengeStorage,
+}
+
+impl MakeRedirect {
+    pub const fn new(challenges: ChallengeStorage) -> Self {
+        Self { challenges }
+    }
+}
 
 impl<T> Service<T> for MakeRedirect {
     type Response = Redirect;
@@ -62,6 +82,8 @@ impl<T> Service<T> for MakeRedirect {
     }
 
     fn call(&mut self, _req: T) -> Self::Future {
-        future::ok(Redirect)
+        future::ok(Redirect {
+            challenges: self.challenges.clone(),
+        })
     }
 }

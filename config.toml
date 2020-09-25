@@ -1,0 +1,5 @@
+[acme]
+email = "sample@gmail.com"
+
+[routes]
+"sample.com" = "127.0.0.1:1111"
