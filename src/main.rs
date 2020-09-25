@@ -15,8 +15,8 @@ use eyre::Result;
 use futures_util::future;
 use hyper::server::conn::AddrIncoming;
 use hyper::{Client, Server};
+use log::info;
 use rustls::{NoClientAuth, ServerConfig};
-use tracing::info;
 
 use crate::acme::{Acme, ChallengeStorage};
 use crate::cert::Resolver;
@@ -33,7 +33,7 @@ mod tls;
 async fn main() -> Result<()> {
     env::set_var("RUST_LOG", "info,charon=trace");
     color_eyre::install()?;
-    tracing_subscriber::fmt::init();
+    pretty_env_logger::init();
 
     let settings = settings::load()?;
     let challenges = ChallengeStorage::default();

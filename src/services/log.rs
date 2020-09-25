@@ -12,9 +12,9 @@ use chrono::prelude::*;
 use hyper::http::uri::PathAndQuery;
 use hyper::{Request, Response};
 use hyperx::header::{Authorization, Basic, ContentLength, Referer, TypedHeaders, UserAgent};
+use log::info;
 use tower::layer::Layer;
 use tower::Service;
-use tracing::info;
 
 pub struct LogLayer {
     remote_addr: SocketAddr,
