@@ -1,11 +1,10 @@
 //! Logging middleware service.
 
-#![allow(clippy::redundant_pub_crate)]
-
 use std::fmt::{self, Display};
 use std::future::Future;
 use std::net::SocketAddr;
 use std::pin::Pin;
+use std::task::{Context, Poll};
 use std::time::Instant;
 
 use chrono::prelude::*;
@@ -13,6 +12,7 @@ use hyper::http::uri::PathAndQuery;
 use hyper::{Request, Response};
 use hyperx::header::{Authorization, Basic, ContentLength, Referer, TypedHeaders, UserAgent};
 use log::info;
+use pin_project::pin_project;
 use tower::layer::Layer;
 use tower::Service;
 
@@ -90,7 +90,7 @@ struct RequestInfo {
     version: hyper::Version,
 }
 
-#[pin_project::pin_project]
+#[pin_project]
 pub struct ResponseFuture<T> {
     start: Instant,
     remote_addr: SocketAddr,
@@ -98,8 +98,6 @@ pub struct ResponseFuture<T> {
     #[pin]
     response: T,
 }
-
-use std::task::{Context, Poll};
 
 impl<F, T, E> ResponseFuture<F>
 where
