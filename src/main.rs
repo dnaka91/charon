@@ -31,7 +31,7 @@ mod tls;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    env::set_var("RUST_LOG", "info,charon=trace");
+    env::set_var("RUST_LOG", "warn,charon=trace");
     color_eyre::install()?;
     pretty_env_logger::init();
 
