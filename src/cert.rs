@@ -56,13 +56,12 @@ pub fn load(
     Ok(resolver)
 }
 
-#[allow(clippy::map_err_ignore)]
 fn load_certkey(cert: impl Read, key: impl Read) -> Result<CertifiedKey> {
     let certs =
-        pemfile::certs(&mut BufReader::new(cert)).map_err(|_| eyre!("invalid certificate"))?;
+        pemfile::certs(&mut BufReader::new(cert)).map_err(|()| eyre!("invalid certificate"))?;
 
     let keys =
-        pemfile::pkcs8_private_keys(&mut BufReader::new(key)).map_err(|_| eyre!("invalid key"))?;
+        pemfile::pkcs8_private_keys(&mut BufReader::new(key)).map_err(|()| eyre!("invalid key"))?;
 
     let certkey = CertifiedKey::new(certs, Arc::new(sign::any_supported_type(&keys[0]).unwrap()));
 
