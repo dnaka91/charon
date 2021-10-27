@@ -1,17 +1,19 @@
 //! Certificate management.
 
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{prelude::*, BufReader},
+    sync::Arc,
+};
 
 use ahash::RandomState;
 use arc_swap::ArcSwap;
-use eyre::{eyre, Result};
-use rustls::internal::pemfile;
-use rustls::sign::{self, CertifiedKey};
-use rustls::{ResolvesServerCert, ResolvesServerCertUsingSNI};
+use eyre::Result;
+use rustls::{
+    server::{ResolvesServerCert, ResolvesServerCertUsingSni},
+    sign::{self, CertifiedKey},
+};
 
 use crate::acme;
 
@@ -23,31 +25,34 @@ impl<T: ResolvesServerCert> Resolver<T> {
     }
 
     pub fn swap(&self, inner: T) {
-        self.0.store(Arc::new(inner))
+        self.0.store(Arc::new(inner));
     }
 }
 
 impl<T: ResolvesServerCert> ResolvesServerCert for Resolver<T> {
-    fn resolve(&self, client_hello: rustls::ClientHello<'_>) -> Option<rustls::sign::CertifiedKey> {
+    fn resolve(
+        &self,
+        client_hello: rustls::server::ClientHello<'_>,
+    ) -> Option<Arc<rustls::sign::CertifiedKey>> {
         self.0.load().resolve(client_hello)
     }
 }
 
 pub fn load(
     acme_certs: &HashMap<String, acme::Certificate, RandomState>,
-) -> Result<ResolvesServerCertUsingSNI> {
+) -> Result<ResolvesServerCertUsingSni> {
     let certkey = load_certkey(
         File::open("localhost.pem")?,
         File::open("localhost-key.pem")?,
     )?;
 
-    let mut resolver = ResolvesServerCertUsingSNI::new();
+    let mut resolver = ResolvesServerCertUsingSni::new();
     resolver.add("localhost", certkey)?;
 
     for (domain, acme_cert) in acme_certs {
         let certkey = load_certkey(
-            &acme_cert.certificate().as_bytes()[..],
-            &acme_cert.private_key().as_bytes()[..],
+            acme_cert.certificate().as_bytes(),
+            acme_cert.private_key().as_bytes(),
         )?;
 
         resolver.add(domain, certkey)?;
@@ -57,13 +62,17 @@ pub fn load(
 }
 
 fn load_certkey(cert: impl Read, key: impl Read) -> Result<CertifiedKey> {
-    let certs =
-        pemfile::certs(&mut BufReader::new(cert)).map_err(|()| eyre!("invalid certificate"))?;
+    let certs = rustls_pemfile::certs(&mut BufReader::new(cert))?
+        .into_iter()
+        .map(rustls::Certificate)
+        .collect();
 
-    let keys =
-        pemfile::pkcs8_private_keys(&mut BufReader::new(key)).map_err(|()| eyre!("invalid key"))?;
+    let mut keys = rustls_pemfile::pkcs8_private_keys(&mut BufReader::new(key))?;
 
-    let certkey = CertifiedKey::new(certs, Arc::new(sign::any_supported_type(&keys[0]).unwrap()));
+    let certkey = CertifiedKey::new(
+        certs,
+        sign::any_supported_type(&rustls::PrivateKey(keys.swap_remove(0))).unwrap(),
+    );
 
     Ok(certkey)
 }

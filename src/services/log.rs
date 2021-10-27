@@ -1,20 +1,22 @@
 //! Logging middleware service.
 
-use std::fmt::{self, Display};
-use std::future::Future;
-use std::net::SocketAddr;
-use std::pin::Pin;
-use std::task::{Context, Poll};
-use std::time::Instant;
+use std::{
+    fmt::{self, Display},
+    future::Future,
+    net::SocketAddr,
+    pin::Pin,
+    task::{Context, Poll},
+    time::Instant,
+};
 
 use chrono::prelude::*;
-use hyper::http::uri::PathAndQuery;
-use hyper::{Request, Response};
-use hyperx::header::{Authorization, Basic, ContentLength, Referer, TypedHeaders, UserAgent};
+use headers::{
+    authorization::Basic, Authorization, ContentLength, Header, HeaderMapExt, Referer, UserAgent,
+};
+use hyper::{http::uri::PathAndQuery, Request, Response};
 use log::info;
 use pin_project::pin_project;
-use tower::layer::Layer;
-use tower::Service;
+use tower::{layer::Layer, Service};
 
 pub struct LogLayer {
     remote_addr: SocketAddr,
@@ -73,9 +75,13 @@ fn extract<T>(req: &Request<T>) -> RequestInfo {
 
     RequestInfo {
         path_and_query,
-        authorization: req.headers().decode::<Authorization<Basic>>().ok(),
-        referrer: req.headers().decode::<Referer>().ok(),
-        user_agent: req.headers().decode::<UserAgent>().ok(),
+        authorization: req.headers().typed_get(),
+        referrer: req
+            .headers()
+            .get(Referer::name())
+            .and_then(|v| v.to_str().ok())
+            .map(str::to_owned),
+        user_agent: req.headers().typed_get(),
         method: req.method().clone(),
         version: req.version(),
     }
@@ -84,7 +90,7 @@ fn extract<T>(req: &Request<T>) -> RequestInfo {
 struct RequestInfo {
     path_and_query: PathAndQuery,
     authorization: Option<Authorization<Basic>>,
-    referrer: Option<Referer>,
+    referrer: Option<String>,
     user_agent: Option<UserAgent>,
     method: hyper::Method,
     version: hyper::Version,
@@ -106,18 +112,14 @@ where
     fn log(remote_addr: SocketAddr, req: &RequestInfo, start: Instant, rsp: &Response<T>) {
         let content_length = rsp
             .headers()
-            .decode::<ContentLength>()
-            .ok()
+            .typed_get::<ContentLength>()
             .map(|v| v.0)
             .unwrap_or_default();
 
         info!(
             r#"{} - {} [{}] "{} {} {:?}" {} {} "{}" "{}" 0 "-" "-" {}ms"#,
             remote_addr.ip(),
-            req.authorization
-                .as_ref()
-                .map(|a| a.0.username.as_str())
-                .display(),
+            req.authorization.as_ref().map(|a| a.0.username()).display(),
             Utc::now().format("%d/%b/%Y:%T %z"),
             req.method,
             req.path_and_query,

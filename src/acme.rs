@@ -1,11 +1,8 @@
 //! ACME certificate renewal.
 
-use std::collections::HashMap;
-use std::fs;
-use std::sync::Arc;
+use std::{collections::HashMap, fs, sync::Arc};
 
-use acme_lib::persist::FilePersist;
-use acme_lib::{Account, Directory, DirectoryUrl};
+use acme_lib::{persist::FilePersist, Account, Directory, DirectoryUrl};
 use ahash::RandomState;
 use eyre::{eyre, Result};
 use parking_lot::RwLock;

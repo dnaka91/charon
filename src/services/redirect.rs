@@ -1,15 +1,20 @@
 //! HTTP to HTTPS redirect service.
 
-use std::convert::Infallible;
-use std::task::{Context, Poll};
+use std::{
+    convert::Infallible,
+    task::{Context, Poll},
+};
 
 use eyre::Result;
 use futures_util::future;
-use hyper::http::header::{HOST, LOCATION};
-use hyper::http::uri::PathAndQuery;
-use hyper::http::StatusCode;
-use hyper::http::Uri;
-use hyper::{Body, Request, Response};
+use hyper::{
+    http::{
+        header::{HOST, LOCATION},
+        uri::PathAndQuery,
+        StatusCode, Uri,
+    },
+    Body, Request, Response,
+};
 use tower::Service;
 
 use crate::acme::ChallengeStorage;

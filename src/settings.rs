@@ -1,7 +1,6 @@
 //! Global application settings.
 
-use std::collections::HashMap;
-use std::fs;
+use std::{collections::HashMap, fs};
 
 use ahash::RandomState;
 use eyre::Result;

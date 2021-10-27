@@ -8,20 +8,20 @@
 #![warn(clippy::nursery)]
 #![allow(dead_code, clippy::module_name_repetitions)]
 
-use std::env;
-use std::sync::Arc;
+use std::{env, sync::Arc};
 
 use eyre::Result;
 use futures_util::future;
-use hyper::server::conn::AddrIncoming;
-use hyper::{Client, Server};
+use hyper::{server::conn::AddrIncoming, Client, Server};
 use log::info;
-use rustls::{NoClientAuth, ServerConfig};
+use rustls::server::ServerConfig;
 
-use crate::acme::{Acme, ChallengeStorage};
-use crate::cert::Resolver;
-use crate::services::{MakeRedirect, MakeSvc};
-use crate::tls::TlsAcceptor;
+use crate::{
+    acme::{Acme, ChallengeStorage},
+    cert::Resolver,
+    services::{MakeRedirect, MakeSvc},
+    tls::TlsAcceptor,
+};
 
 mod acme;
 mod cert;
@@ -29,6 +29,7 @@ mod services;
 mod settings;
 mod tls;
 
+#[allow(clippy::similar_names)]
 #[tokio::main]
 async fn main() -> Result<()> {
     env::set_var("RUST_LOG", "warn,charon=trace");
@@ -45,8 +46,10 @@ async fn main() -> Result<()> {
     let resolver = cert::load(&certs)?;
     let resolver = Arc::new(Resolver::new(resolver));
 
-    let mut config = ServerConfig::new(NoClientAuth::new());
-    config.cert_resolver = resolver.clone();
+    let config = ServerConfig::builder()
+        .with_safe_defaults()
+        .with_no_client_auth()
+        .with_cert_resolver(resolver.clone());
 
     let https_addr = ([0, 0, 0, 0], 8443).into();
     let incoming = AddrIncoming::bind(&https_addr)?;

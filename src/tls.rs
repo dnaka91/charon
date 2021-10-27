@@ -1,15 +1,19 @@
 //! TLS impelementation for [`hyper`] mostly copied from [`warp`](https://crates.io/crates/warp).
 
-use std::future::Future;
-use std::net::SocketAddr;
-use std::pin::Pin;
-use std::sync::Arc;
-use std::task::{Context, Poll};
+use std::{
+    future::Future,
+    net::SocketAddr,
+    pin::Pin,
+    sync::Arc,
+    task::{Context, Poll},
+};
 
 use eyre::Result;
 use futures_util::ready;
-use hyper::server::accept::Accept;
-use hyper::server::conn::{AddrIncoming, AddrStream};
+use hyper::server::{
+    accept::Accept,
+    conn::{AddrIncoming, AddrStream},
+};
 use rustls::ServerConfig;
 use tokio::io::{self, AsyncRead, AsyncWrite, ReadBuf};
 
