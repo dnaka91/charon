@@ -15,18 +15,18 @@ color-eyre = { version = "0.6.1", default-features = false }
 eyre = "0.6.8"
 futures-util = "0.3.21"
 headers = "0.3.7"
-hyper = { version = "0.14.18", features = ["full"] }
+hyper = { version = "0.14.19", features = ["full"] }
 log = { version = "0.4.17", features = ["release_max_level_info"] }
-parking_lot = "0.12.0"
+parking_lot = "0.12.1"
 pin-project = "1.0.10"
 pretty_env_logger = "0.4.0"
 rustls = { version = "0.20.6", default-features = false }
 rustls-pemfile = "1.0.0"
 serde = { version = "1.0.137", features = ["derive"] }
-tokio = { version = "1.18.2", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread"] }
 tokio-rustls = "0.23.4"
 toml = "0.5.9"
-tower = "0.4.12"
+tower = "0.4.13"
 
 [profile.release]
 lto = true
