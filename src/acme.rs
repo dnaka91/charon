@@ -15,7 +15,7 @@ pub struct Challenge {
 impl Challenge {
     fn new(token: &str, proof: String) -> Self {
         Self {
-            path: format!("/.well-known/acme-challenge/{}", token),
+            path: format!("/.well-known/acme-challenge/{token}"),
             proof,
         }
     }
