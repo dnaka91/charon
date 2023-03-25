@@ -18,5 +18,5 @@ pub struct Acme {
 }
 
 pub fn load() -> Result<Settings> {
-    toml::from_slice(&fs::read("config.toml")?).map_err(Into::into)
+    basic_toml::from_slice(&fs::read("config.toml")?).map_err(Into::into)
 }

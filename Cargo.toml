@@ -7,25 +7,25 @@ license = "MIT"
 
 [dependencies]
 acme-lib = "0.8.2"
-ahash = "0.7.6"
-arc-swap = "1.5.0"
+ahash = "0.8.3"
+arc-swap = "1.6.0"
 async-acme = { version = "0.3.1", features = ["hyper_rustls"] }
-chrono = "0.4.19"
-color-eyre = { version = "0.6.1", default-features = false }
+basic-toml = "0.1.2"
+chrono = "0.4.24"
+color-eyre = { version = "0.6.2", default-features = false }
 eyre = "0.6.8"
-futures-util = "0.3.21"
-headers = "0.3.7"
-hyper = { version = "0.14.19", features = ["full"] }
+futures-util = "0.3.27"
+headers = "0.3.8"
+hyper = { version = "0.14.25", features = ["full"] }
 log = { version = "0.4.17", features = ["release_max_level_info"] }
 parking_lot = "0.12.1"
-pin-project = "1.0.10"
+pin-project = "1.0.12"
 pretty_env_logger = "0.4.0"
-rustls = { version = "0.20.6", default-features = false }
-rustls-pemfile = "1.0.0"
-serde = { version = "1.0.137", features = ["derive"] }
-tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread"] }
+rustls = { version = "0.20.8", default-features = false }
+rustls-pemfile = "1.0.2"
+serde = { version = "1.0.158", features = ["derive"] }
+tokio = { version = "1.26.0", features = ["macros", "rt-multi-thread"] }
 tokio-rustls = "0.23.4"
-toml = "0.5.9"
 tower = "0.4.13"
 
 [profile.release]
